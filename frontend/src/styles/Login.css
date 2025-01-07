@@ -191,7 +191,7 @@
     }
 }
 
-/* 480px felett (mobilok nagyobb képernyője) */
+/* 480px felett (mobilok) */
 @media (min-width: 480px) {
     .login-container {
         padding: 40px;
