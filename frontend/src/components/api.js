@@ -53,4 +53,33 @@ export const logout = () => {
     }
 };
 
+export const getFavourites = async () => {
+    try {
+        const response = await API.get('/favourites/');
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching favourites:", error);
+        throw error;
+    }
+};
+
+export const addFavourite = async (bookId) => {
+    try {
+        API.post("/favourites/", { book: bookId });
+    } catch (error) {
+        console.error("Error adding favourite:", error);
+        throw error;
+    }
+};
+
+export const removeFavourite = async (favouriteId) => {
+    try {
+        const response = await API.delete(`/favourites/${favouriteId}/`);
+        return response.data;
+    } catch(error) {
+        console.error("Error deleting favourite:", error);
+        throw error;
+    }
+};
+
 export default API; // Az Axios konfigurált példányának exportálása

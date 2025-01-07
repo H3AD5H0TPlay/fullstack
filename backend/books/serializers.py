@@ -3,7 +3,7 @@
 # illetve bejövő JSON feldolgozása a modellekhez.
 
 from rest_framework import serializers
-from .models import Book
+from .models import Book, Favourite
 from django.contrib.auth.models import User
 
 # BookSerializer: A Book modelt szerializáljuk,
@@ -81,3 +81,9 @@ class RegisterSerializer(serializers.ModelSerializer):
             password=validated_data['password']
         )
         return user
+
+
+class FavouriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Favourite
+        fields = ['user', 'book', 'added_at']

@@ -4,12 +4,13 @@
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from books.views import BookViewSet, RegisterView, current_user
+from books.views import BookViewSet, RegisterView, current_user, FavouriteViewSet, Favourite
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 # DefaultRouter: automatikusan generál útvonalakat a ViewSet-ek számára
 router = DefaultRouter()
 router.register(r'books', BookViewSet)
+router.register(r'favourites', FavouriteViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

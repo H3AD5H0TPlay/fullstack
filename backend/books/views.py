@@ -6,8 +6,8 @@ from rest_framework import viewsets, status
 from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Book
-from .serializers import BookSerializer, RegisterSerializer
+from .models import Book, Favourite
+from .serializers import BookSerializer, RegisterSerializer, FavouriteSerializer
 from rest_framework.decorators import api_view
 from django.contrib.auth.models import User
 from django.db import IntegrityError
@@ -113,3 +113,12 @@ def logout_view(request):
         return Response({"message": "Logout successful."}, status=status.HTTP_205_RESET_CONTENT)
     except Exception as e:
         return Response({"error": "Invalid token."}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class FavouriteViewSet(viewsets.ModelViewSet):
+    serializer_class = FavouriteSerializer
+    permission_classes = [IsAuthenticated]
+    queryset = Favourite.objects.all()
+
+    def get_queryset(self):
+        return Favourite.objects.filter(user=self.request.user)

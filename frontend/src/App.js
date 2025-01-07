@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import Login from "./components/Login";
 import Register from "./components/Register";
 import BookList from "./components/BookList";
+import MyFavourites from "./components/MyFavourites";
 
 const App = () => {
     const [token, setToken] = useState(localStorage.getItem("token")); // Token állapot
@@ -41,6 +42,16 @@ const App = () => {
                                 <BookList logoutInProgress={logoutInProgress} />
                             ) : (
                                 <Navigate to="/login" />
+                            )
+                        }
+                    />
+                    <Route
+                        path="/favourites"
+                        element = {
+                            token ? (
+                                <MyFavourites />
+                            ) : (
+                                <Navigate to ="/login"/>
                             )
                         }
                     />

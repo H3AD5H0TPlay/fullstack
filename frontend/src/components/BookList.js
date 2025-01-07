@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import API from "./api"; // Egyedi API modul a backend kérésekhez
+import API, { addFavourite, getFavourites, removeFavourite } from "./api"; // Egyedi API modul a backend kérésekhez
 import "../styles/BookList.css"; // Komponens stílusai
 
 const BookList = () => {
@@ -35,6 +35,7 @@ const BookList = () => {
     const [newBook, setNewBook] = useState({ title: "", description: "" }); // Új könyv adatai
     const [editingBook, setEditingBook] = useState(null); // Szerkesztett könyv
     const [currentUser, setCurrentUser] = useState(""); // Aktuális felhasználó
+    const [favourites, setFavourites] = useState([]);
 
     /*
       Kijelentkezés kezelése: Token törlése, állapot frissítése és átirányítás a bejelentkezési oldalra.
@@ -62,6 +63,42 @@ const BookList = () => {
                 }
             });
     }, [logout]);
+
+
+    const handleAddFavourite = async (bookId) => {
+        try {
+            await addFavourite(bookId);
+            setFavourites([...favourites, bookId]); // Frissítjük a kedvencek listáját
+        } catch (error) {
+            console.error("Error adding favourite:", error);
+        }
+    };
+    
+    const handleRemoveFavourite = async (bookId) => {
+        try {
+            await removeFavourite(bookId);
+            setFavourites(favourites.filter((id) => id !== bookId)); // Frissítjük a kedvencek listáját
+        } catch (error) {
+            console.error("Error removing favourite:", error);
+        }
+    };
+    
+    
+    useEffect(() => {
+        const fetchFavourites = async () => {
+            try {
+                const data = await getFavourites();
+                setFavourites(data.map((fav) => fav.book)); // Csak a könyv ID-kat tároljuk
+            } catch (error) {
+                console.error("Error fetching favourites:", error);
+            }
+        };
+    
+        fetchFavourites();
+    }, []);
+    
+    
+
 
     /*
       Aktuális felhasználó adatainak lekérése az API-ból. Kezeli a 401-es hibát.
@@ -154,13 +191,13 @@ const BookList = () => {
         <div className="book-box">
             {/* Saját Logout gomb */}
             <button className="logout-btn" onClick={logout}>
-            <div className="sign">
-                <svg viewBox="0 0 512 512">
-                    <path
-                        d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"
-                    ></path>
-                </svg>
-            </div>
+                <div className="sign">
+                    <svg viewBox="0 0 512 512">
+                        <path
+                            d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"
+                        ></path>
+                    </svg>
+                </div>
                 <div className="text">Logout</div>
             </button>
             <p className="book-title">Book Manager</p>
@@ -196,7 +233,7 @@ const BookList = () => {
                     Add Book
                 </button>
             </form>
-
+    
             <ul className="book-list">
                 {books.map((book) => (
                     <li key={book.id} className="book-item">
@@ -249,6 +286,21 @@ const BookList = () => {
                                 <p>
                                     <strong>Description:</strong> {book.description}
                                 </p>
+                                {favourites.includes(book.id) ? (
+                                    <button
+                                        className="favourite-btn"
+                                        onClick={() => handleRemoveFavourite(book.id)}
+                                    >
+                                        -
+                                    </button>
+                                ) : (
+                                    <button
+                                        className="favourite-btn"
+                                        onClick={() => handleAddFavourite(book.id)}
+                                    >
+                                        +
+                                    </button>
+                                )}
                                 {book.owner === currentUser && (
                                     <div className="book-actions">
                                         <button
@@ -272,6 +324,7 @@ const BookList = () => {
             </ul>
         </div>
     );
+    
 };
 
 export default BookList;
