@@ -65,12 +65,15 @@ export const getFavourites = async () => {
 
 export const addFavourite = async (bookId) => {
     try {
-        API.post("/favourites/", { book: bookId });
+        const response = await API.post("/favourites/", { book: bookId });
+        return response.data;
     } catch (error) {
-        console.error("Error adding favourite:", error);
+        console.error("Error adding favourite:", error.response?.data || error);
         throw error;
     }
 };
+
+
 
 export const removeFavourite = async (favouriteId) => {
     try {

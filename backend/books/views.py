@@ -122,3 +122,7 @@ class FavouriteViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Favourite.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        print("Serializer data before saving:", serializer.validated_data)  # Debug
+        serializer.save(user=self.request.user)

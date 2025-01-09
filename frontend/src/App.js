@@ -45,16 +45,7 @@ const App = () => {
                             )
                         }
                     />
-                    <Route
-                        path="/favourites"
-                        element = {
-                            token ? (
-                                <MyFavourites />
-                            ) : (
-                                <Navigate to ="/login"/>
-                            )
-                        }
-                    />
+                    <Route path="/favourites" element={<MyFavourites />} />
                 </Routes>
             </div>
         </Router>

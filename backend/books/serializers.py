@@ -84,6 +84,11 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class FavouriteSerializer(serializers.ModelSerializer):
+    book = serializers.PrimaryKeyRelatedField(queryset=Book.objects.all())
+
     class Meta:
         model = Favourite
-        fields = ['user', 'book', 'added_at']
+        fields = ['id', 'user', 'book', 'added_at']
+        extra_kwargs = {
+            'user': {'read_only': True},
+        }

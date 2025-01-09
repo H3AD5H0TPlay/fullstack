@@ -67,21 +67,26 @@ const BookList = () => {
 
     const handleAddFavourite = async (bookId) => {
         try {
-            await addFavourite(bookId);
-            setFavourites([...favourites, bookId]); // Frissítjük a kedvencek listáját
+            const response = await addFavourite(bookId); // Backend API hívás
+            setFavourites([...favourites, response.book]); // Frissítjük a kedvencek listáját
         } catch (error) {
-            console.error("Error adding favourite:", error);
+            console.error("Error adding favourite:", error.response?.data || error);
         }
     };
     
     const handleRemoveFavourite = async (bookId) => {
         try {
-            await removeFavourite(bookId);
-            setFavourites(favourites.filter((id) => id !== bookId)); // Frissítjük a kedvencek listáját
+            const favToRemove = favourites.find((fav) => fav.id === bookId); // Kedvenc azonosítása
+            if (!favToRemove) return;
+    
+            await removeFavourite(favToRemove.id); // API hívás a törléshez
+            setFavourites(favourites.filter((fav) => fav.id !== bookId)); // Kedvencek listájának frissítése
         } catch (error) {
-            console.error("Error removing favourite:", error);
+            console.error("Error removing favourite:", error.response?.data || error);
         }
     };
+    
+    
     
     
     useEffect(() => {
@@ -189,6 +194,13 @@ const BookList = () => {
     // Komponens megjelenítése
     return (
         <div className="book-box">
+            <nav>
+                <ul className="navigation">
+                    <li>
+                        <a href="/favourites" className="nav-link">My favuorites</a>
+                    </li>
+                </ul>
+            </nav>
             {/* Saját Logout gomb */}
             <button className="logout-btn" onClick={logout}>
                 <div className="sign">
@@ -235,93 +247,32 @@ const BookList = () => {
             </form>
     
             <ul className="book-list">
-                {books.map((book) => (
-                    <li key={book.id} className="book-item">
-                        {editingBook && editingBook.id === book.id ? (
-                            <div className="book-edit-form">
-                                <div className="book-field">
-                                    <input
-                                        className="book-input"
-                                        type="text"
-                                        value={editingBook.title}
-                                        onChange={(e) =>
-                                            setEditingBook({ ...editingBook, title: e.target.value })
-                                        }
-                                        required
-                                    />
-                                    <label className="book-label">Title</label>
-                                </div>
-                                <div className="book-field">
-                                    <textarea
-                                        className="book-input"
-                                        value={editingBook.description}
-                                        onChange={(e) =>
-                                            setEditingBook({
-                                                ...editingBook,
-                                                description: e.target.value,
-                                            })
-                                        }
-                                        required
-                                    ></textarea>
-                                    <label className="book-label">Description</label>
-                                </div>
-                                <button
-                                    className="book-btn"
-                                    onClick={() => {
-                                        editBook(book.id);
-                                    }}
-                                >
-                                    Save
-                                </button>
-                                <button
-                                    className="book-btn"
-                                    onClick={() => setEditingBook(null)}
-                                >
-                                    Cancel
-                                </button>
-                            </div>
-                        ) : (
-                            <div className="book-item-content">
-                                <h3>{book.title}</h3>
-                                <p>
-                                    <strong>Description:</strong> {book.description}
-                                </p>
-                                {favourites.includes(book.id) ? (
-                                    <button
-                                        className="favourite-btn"
-                                        onClick={() => handleRemoveFavourite(book.id)}
-                                    >
-                                        -
-                                    </button>
-                                ) : (
-                                    <button
-                                        className="favourite-btn"
-                                        onClick={() => handleAddFavourite(book.id)}
-                                    >
-                                        +
-                                    </button>
-                                )}
-                                {book.owner === currentUser && (
-                                    <div className="book-actions">
-                                        <button
-                                            className="book-btn"
-                                            onClick={() => setEditingBook(book)}
-                                        >
-                                            Edit
-                                        </button>
-                                        <button
-                                            className="book-btn"
-                                            onClick={() => deleteBook(book.id)}
-                                        >
-                                            Delete
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </li>
-                ))}
-            </ul>
+    {books.map((book) => (
+        <li key={book.id} className="book-item">
+            <div className="book-item-content">
+                <h3>{book.title}</h3>
+                <p><strong>Description:</strong> {book.description}</p>
+                {favourites.some((fav) => fav.book && fav.book.id === book.id) ? ( // Ellenőrizd, hogy a kedvencek között van-e
+
+                    <button
+                        className="favourite-btn"
+                        onClick={() => handleRemoveFavourite(book.id)}
+                    >
+                        -
+                    </button>
+                ) : (
+                    <button
+                        className="favourite-btn"
+                        onClick={() => handleAddFavourite(book.id)}
+                    >
+                        +
+                    </button>
+                )}
+            </div>
+        </li>
+    ))}
+</ul>
+
         </div>
     );
     

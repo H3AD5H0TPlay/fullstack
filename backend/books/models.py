@@ -18,17 +18,12 @@ class Book(models.Model):
 
     def __str__(self):
         return f"{self.title} by {self.owner.username}"
-    
-# Favourite model: many-many kapcsolat könyv és felhasználó között, de minden felhasználó csak egyszer teheti be ugyanazt a könyvet a kedvencekbe
+
+
 class Favourite(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="favourites")
-    book = models.ForeignKey(User, on_delete=models.CASCADE, related_name="favourited_by")
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
     added_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('user', 'book')
-        verbose_name = 'Favourite'
-        verbose_name_plural = 'Favourites'
-
-    def __str__(self):
-        return f"{self.user.username} -> {self.book.title}"
+        unique_together = ('user', 'book')  # Egy felhasználó nem adhatja hozzá ugyanazt a könyvet többször
